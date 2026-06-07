@@ -6,7 +6,12 @@ Every decision is logged with reasoning.
 
 import logging
 import logging.handlers
-import colorlog
+try:
+    import colorlog
+    _HAS_COLORLOG = True
+except Exception:
+    colorlog = None
+    _HAS_COLORLOG = False
 import json
 from datetime import datetime
 from pathlib import Path
@@ -25,20 +30,28 @@ def setup_logging() -> logging.Logger:
     """Configure root logger with console + rotating file handlers."""
     log_level = getattr(logging, settings.log_level.upper(), logging.INFO)
 
-    # Console handler (colored)
-    console = colorlog.StreamHandler()
-    console.setLevel(log_level)
-    console.setFormatter(colorlog.ColoredFormatter(
-        "%(log_color)s%(asctime)s [%(levelname)s]%(reset)s %(name)s — %(message)s",
-        datefmt="%H:%M:%S",
-        log_colors={
-            "DEBUG":    "cyan",
-            "INFO":     "green",
-            "WARNING":  "yellow",
-            "ERROR":    "red",
-            "CRITICAL": "bold_red",
-        },
-    ))
+    # Console handler (colored when available, otherwise plain)
+    if _HAS_COLORLOG:
+        console = colorlog.StreamHandler()
+        console.setLevel(log_level)
+        console.setFormatter(colorlog.ColoredFormatter(
+            "%(log_color)s%(asctime)s [%(levelname)s]%(reset)s %(name)s — %(message)s",
+            datefmt="%H:%M:%S",
+            log_colors={
+                "DEBUG":    "cyan",
+                "INFO":     "green",
+                "WARNING":  "yellow",
+                "ERROR":    "red",
+                "CRITICAL": "bold_red",
+            },
+        ))
+    else:
+        console = logging.StreamHandler()
+        console.setLevel(log_level)
+        console.setFormatter(logging.Formatter(
+            "%(asctime)s [%(levelname)s] %(name)s — %(message)s",
+            datefmt="%H:%M:%S",
+        ))
 
     # File handler (JSON lines for easy parsing)
     log_file = LOG_DIR / f"bot_{datetime.utcnow().strftime('%Y%m%d')}.log"
