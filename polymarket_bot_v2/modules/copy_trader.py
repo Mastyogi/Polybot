@@ -198,7 +198,20 @@ class CopyTrader:
                 timeout=aiohttp.ClientTimeout(total=15),
             ) as resp:
                 if resp.status != 200:
-                    log.warning("Leaderboard API returned %d", resp.status)
+                    # Capture body for diagnostics
+                    try:
+                        body = await resp.text()
+                    except Exception:
+                        body = "<unreadable>"
+                    if resp.status == 404:
+                        log.info(
+                            "Leaderboard endpoint %s returned 404 — using cached wallets",
+                            self.LEADERBOARD_URL,
+                        )
+                        # Avoid spamming repeated 404 warnings by treating this as a successful refresh
+                        self._last_leaderboard_refresh = now
+                    else:
+                        log.warning("Leaderboard API returned %d: %s", resp.status, body)
                     return list(self._tracked_wallets.values())
                 data = await resp.json()
 
