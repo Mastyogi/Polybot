@@ -219,7 +219,7 @@ class PolyBot:
                     continue
 
                 all_markets = self.scanner.get_all_active()
-                opportunities = self.arb.scan(all_markets)
+                opportunities = await self.arb.scan(all_markets)
 
                 for opp in opportunities:
                     if not opp.is_actionable():

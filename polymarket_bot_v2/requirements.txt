@@ -2,6 +2,13 @@
 aiohttp>=3.9.0
 websockets>=12.0
 
+# Web framework
+fastapi>=0.104.0
+uvicorn>=0.24.0
+
+# UI/Display
+rich>=13.0.0
+
 # Prediction market client
 # py-clob-client       # Uncomment for LIVE mode only
 
@@ -24,3 +31,4 @@ python-telegram-bot>=20.0
 
 # Utilities
 python-dateutil>=2.8.0
+colorlog>=6.7.0
