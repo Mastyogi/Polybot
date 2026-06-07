@@ -25,6 +25,7 @@ COPY README.md .
 
 # Install Python dependencies
 RUN pip install --upgrade pip && \
+    pip install --no-cache-dir colorlog==6.7.0 && \
     pip install --no-cache-dir -r polymarket_bot_v2/requirements.txt
 
 # Create data and log directories
