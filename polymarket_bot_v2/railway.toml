@@ -5,7 +5,7 @@
 
 [build]
 rootDirectory = "polymarket_bot_v2"
-dockerfile = "Dockerfile"
+dockerfile = "polymarket_bot_v2/Dockerfile"
 
 [deploy]
 startCommand = "python main.py --mode paper --capital 10"
