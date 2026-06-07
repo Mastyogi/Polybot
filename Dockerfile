@@ -19,12 +19,12 @@ RUN apt-get update && apt-get install -y \
 
 WORKDIR /app
 
-# Install Python deps first (layer cache optimization)
-COPY polymarket_bot_v2/requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+# Copy source code and config
+COPY polymarket_bot_v2/ ./polymarket_bot_v2/
+COPY README.md .
 
-# Copy entire repo structure (preserves polymarket_bot_v2 subdirectory)
-COPY . .
+# Install Python dependencies
+RUN pip install --no-cache-dir -r polymarket_bot_v2/requirements.txt
 
 # Create data and log directories
 RUN mkdir -p data logs
