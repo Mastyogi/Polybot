@@ -23,11 +23,11 @@ WORKDIR /app
 COPY polymarket_bot_v2/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy source code
-COPY polymarket_bot_v2/ .
+# Copy entire repo structure (preserves polymarket_bot_v2 subdirectory)
+COPY . .
 
 # Create data and log directories
 RUN mkdir -p data logs
 
 # Set entrypoint
-CMD ["python", "main.py", "--mode", "paper", "--capital", "10"]
+CMD ["python", "polymarket_bot_v2/main.py", "--mode", "paper", "--capital", "10"]
