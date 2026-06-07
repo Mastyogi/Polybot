@@ -1,0 +1,18 @@
+# railway.toml — Deploy PolyBot to Railway.app
+# Dashboard: https://<your-app>.railway.app
+# Docs: https://docs.railway.app
+
+[build]
+dockerfile = "Dockerfile"
+
+[deploy]
+startCommand = "python polymarket_bot_v2/main.py --mode paper --capital 10"
+healthcheckPath = "/"
+healthcheckTimeout = 30
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 5
+
+[deploy.env]
+PORT = "8765"
+DASHBOARD_PORT = "8765"
+MODE = "paper"
