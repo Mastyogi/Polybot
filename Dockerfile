@@ -24,7 +24,8 @@ COPY polymarket_bot_v2/ ./polymarket_bot_v2/
 COPY README.md .
 
 # Install Python dependencies
-RUN pip install --no-cache-dir -r polymarket_bot_v2/requirements.txt
+RUN pip install --upgrade pip && \
+    pip install --no-cache-dir -r polymarket_bot_v2/requirements.txt
 
 # Create data and log directories
 RUN mkdir -p data logs
