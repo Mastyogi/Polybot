@@ -4,7 +4,6 @@
 # Docs: https://docs.railway.app
 
 [build]
-rootDirectory = "polymarket_bot_v2"
 dockerfile = "polymarket_bot_v2/Dockerfile"
 
 [deploy]
