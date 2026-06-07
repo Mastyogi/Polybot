@@ -380,6 +380,11 @@ class CopyTrader:
                      len(signals), signals[0].wallet_score)
         return signals
 
+    # Backwards-compatible wrapper for older callers
+    async def scan_for_copy_signals(self, markets: Dict[str, MarketData]) -> List[CopySignal]:
+        """Compatibility shim for `scan_for_copy_signals` used by main.py in older versions."""
+        return await self.scan_for_signals(markets)
+
     async def _detect_new_positions(self, wallet: WalletProfile) -> List[dict]:
         """Detect markets newly entered since last scan."""
         trades = await self._fetch_trade_history(wallet.address, limit=20)
