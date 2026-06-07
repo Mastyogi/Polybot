@@ -4,9 +4,8 @@
 # Docs: https://docs.railway.app
 
 [build]
-builder = "NIXPACKS"
 rootDirectory = "polymarket_bot_v2"
-buildCommand = "pip install -r requirements.txt"
+dockerfile = "Dockerfile"
 
 [deploy]
 startCommand = "python main.py --mode paper --capital 10"
