@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PolyBot Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-white min-h-screen p-6 font-sans">
+    <div class="max-w-7xl mx-auto space-y-6">
+        <header class="flex justify-between items-center bg-gray-800 p-4 rounded-lg shadow-lg">
+            <h1 class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-emerald-400">PolyBot Dashboard</h1>
+            <div id="statusIndicator" class="flex items-center space-x-2">
+                <div class="w-3 h-3 rounded-full bg-red-500 animate-pulse" id="connStatus"></div>
+                <span class="text-sm font-medium text-gray-300" id="connText">Disconnected</span>
+            </div>
+        </header>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Portfolio Stats -->
+            <div class="col-span-2 bg-gray-800 p-6 rounded-lg shadow-lg">
+                <h2 class="text-xl font-semibold mb-4 border-b border-gray-700 pb-2">Portfolio Overview</h2>
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="bg-gray-700 p-4 rounded-md">
+                        <p class="text-sm text-gray-400">Balance</p>
+                        <p class="text-2xl font-bold" id="valBalance">$0.00</p>
+                    </div>
+                    <div class="bg-gray-700 p-4 rounded-md">
+                        <p class="text-sm text-gray-400">Total P&L</p>
+                        <p class="text-2xl font-bold" id="valTotalPnl">$0.00</p>
+                    </div>
+                    <div class="bg-gray-700 p-4 rounded-md">
+                        <p class="text-sm text-gray-400">Daily P&L</p>
+                        <p class="text-2xl font-bold" id="valDailyPnl">$0.00</p>
+                    </div>
+                    <div class="bg-gray-700 p-4 rounded-md">
+                        <p class="text-sm text-gray-400">Unrealized P&L</p>
+                        <p class="text-2xl font-bold" id="valUnrealizedPnl">$0.00</p>
+                    </div>
+                    <div class="bg-gray-700 p-4 rounded-md">
+                        <p class="text-sm text-gray-400">Free Capital</p>
+                        <p class="text-2xl font-bold text-green-400" id="valFreeUsd">$0.00</p>
+                    </div>
+                    <div class="bg-gray-700 p-4 rounded-md">
+                        <p class="text-sm text-gray-400">Deployed</p>
+                        <p class="text-2xl font-bold" id="valDeployed">$0.00</p>
+                    </div>
+                    <div class="bg-gray-700 p-4 rounded-md">
+                        <p class="text-sm text-gray-400">Drawdown</p>
+                        <p class="text-2xl font-bold text-yellow-400" id="valDrawdown">0.00%</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Risk Status -->
+            <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
+                <h2 class="text-xl font-semibold mb-4 border-b border-gray-700 pb-2">Risk Status</h2>
+                <div class="space-y-4">
+                    <div class="flex justify-between items-center bg-gray-700 p-3 rounded-md">
+                        <span class="text-gray-300">Circuit Breaker</span>
+                        <span class="font-bold px-2 py-1 rounded text-sm" id="riskCb">CLEAR</span>
+                    </div>
+                    <div class="flex justify-between items-center bg-gray-700 p-3 rounded-md">
+                        <span class="text-gray-300">Consecutive Losses</span>
+                        <span class="font-bold text-gray-100" id="riskLosses">0</span>
+                    </div>
+                    <div class="flex justify-between items-center bg-gray-700 p-3 rounded-md">
+                        <span class="text-gray-300">API Errors</span>
+                        <span class="font-bold text-gray-100" id="riskErrors">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Positions -->
+            <div class="col-span-2 bg-gray-800 p-6 rounded-lg shadow-lg overflow-x-auto">
+                <h2 class="text-xl font-semibold mb-4 border-b border-gray-700 pb-2">Open Positions</h2>
+                <table class="w-full text-left text-sm text-gray-300">
+                    <thead class="text-xs text-gray-400 uppercase bg-gray-700">
+                        <tr>
+                            <th class="px-4 py-2">Market</th>
+                            <th class="px-4 py-2">Side</th>
+                            <th class="px-4 py-2">Entry</th>
+                            <th class="px-4 py-2">Current</th>
+                            <th class="px-4 py-2">P&L</th>
+                            <th class="px-4 py-2">Strategy</th>
+                        </tr>
+                    </thead>
+                    <tbody id="positionsBody">
+                        <tr><td colspan="6" class="text-center py-4 text-gray-500">Loading...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Event Log -->
+            <div class="bg-gray-800 p-6 rounded-lg shadow-lg flex flex-col h-full">
+                <h2 class="text-xl font-semibold mb-4 border-b border-gray-700 pb-2">Recent Events</h2>
+                <div id="eventsLog" class="flex-grow overflow-y-auto space-y-2 text-sm text-gray-400 font-mono">
+                    <div>No events yet</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function formatMoney(val) {
+            return '$' + parseFloat(val).toFixed(4);
+        }
+        function formatPct(val) {
+            return (parseFloat(val) * 100).toFixed(2) + '%';
+        }
+        function colorize(val, formatFn) {
+            const num = parseFloat(val);
+            const formatted = formatFn(val);
+            if (num > 0) return `<span class="text-green-400">` + (formatFn === formatMoney ? '+' : '') + formatted + `</span>`;
+            if (num < 0) return `<span class="text-red-400">` + formatted + `</span>`;
+            return `<span class="text-gray-300">` + formatted + `</span>`;
+        }
+
+        const wsUrl = `ws://${window.location.host}/ws`;
+        let ws;
+
+        function connect() {
+            ws = new WebSocket(wsUrl);
+            ws.onopen = () => {
+                document.getElementById('connStatus').className = 'w-3 h-3 rounded-full bg-green-500';
+                document.getElementById('connText').innerText = 'Connected';
+            };
+            ws.onclose = () => {
+                document.getElementById('connStatus').className = 'w-3 h-3 rounded-full bg-red-500 animate-pulse';
+                document.getElementById('connText').innerText = 'Disconnected';
+                setTimeout(connect, 2000);
+            };
+            ws.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                if (data.status === 'loading') return;
+
+                // Update Portfolio
+                document.getElementById('valBalance').innerHTML = formatMoney(data.balance);
+                document.getElementById('valTotalPnl').innerHTML = colorize(data.total_pnl, formatMoney);
+                document.getElementById('valDailyPnl').innerHTML = colorize(data.daily_pnl, formatMoney);
+                document.getElementById('valUnrealizedPnl').innerHTML = colorize(data.unrealized_pnl, formatMoney);
+                document.getElementById('valFreeUsd').innerHTML = formatMoney(data.free_usd);
+                document.getElementById('valDeployed').innerHTML = `${formatMoney(data.deployed_usd)} <span class="text-sm font-normal text-gray-400">(${formatPct(data.deployed_pct)})</span>`;
+                document.getElementById('valDrawdown').innerHTML = formatPct(data.drawdown);
+
+                // Update Risk
+                const risk = data.risk;
+                const cbEl = document.getElementById('riskCb');
+                if (risk.circuit_breaker) {
+                    cbEl.className = 'font-bold px-2 py-1 rounded text-sm bg-red-900 text-red-200';
+                    cbEl.innerText = 'TRIGGERED';
+                } else {
+                    cbEl.className = 'font-bold px-2 py-1 rounded text-sm bg-green-900 text-green-200';
+                    cbEl.innerText = 'CLEAR';
+                }
+                document.getElementById('riskLosses').innerText = risk.consecutive_losses;
+                document.getElementById('riskErrors').innerText = risk.api_error_streak;
+
+                // Update Positions
+                const pBody = document.getElementById('positionsBody');
+                if (data.positions.length === 0) {
+                    pBody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-gray-500">No open positions</td></tr>`;
+                } else {
+                    pBody.innerHTML = data.positions.map(p => `
+                        <tr class="border-b border-gray-700 last:border-0 hover:bg-gray-750">
+                            <td class="px-4 py-3 font-medium truncate max-w-xs" title="${p.market}">${p.market}</td>
+                            <td class="px-4 py-3"><span class="${p.side==='YES'?'text-blue-400':'text-purple-400'} font-bold">${p.side}</span></td>
+                            <td class="px-4 py-3">${p.entry.toFixed(4)}</td>
+                            <td class="px-4 py-3">${p.current > 0 ? p.current.toFixed(4) : 'N/A'}</td>
+                            <td class="px-4 py-3">${colorize(p.pnl, formatMoney)}</td>
+                            <td class="px-4 py-3"><span class="px-2 py-1 bg-gray-700 rounded text-xs">${p.strategy}</span></td>
+                        </tr>
+                    `).join('');
+                }
+
+                // Update Events
+                const evBody = document.getElementById('eventsLog');
+                if (data.events.length > 0) {
+                    evBody.innerHTML = data.events.map(e => `<div class="border-l-2 border-gray-600 pl-2 py-1">${e}</div>`).reverse().join('');
+                }
+            };
+        }
+
+        connect();
+    </script>
+</body>
+</html>

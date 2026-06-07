@@ -1,0 +1,38 @@
+# render.yaml — Deploy PolyBot to Render.com (free tier, US servers)
+# India se access ke liye best free option
+# Docs: https://render.com/docs/blueprint-spec
+
+services:
+  - type: web
+    name: polybot
+    runtime: python
+    region: ohio          # US-East — lowest latency to Polymarket servers
+    plan: free            # Free tier: 512MB RAM, sleeps after 15min inactivity
+                          # Upgrade to Starter ($7/mo) for always-on
+    buildCommand: pip install -r requirements.txt
+    startCommand: python main.py --mode paper --capital 10
+    healthCheckPath: /
+    envVars:
+      - key: MODE
+        value: paper
+      - key: DASHBOARD_PORT
+        value: "8765"
+      - key: LOG_LEVEL
+        value: INFO
+      - key: STARTING_CAPITAL
+        value: "10.0"
+      # Secrets: add these via Render dashboard (never commit)
+      - key: PRIVATE_KEY
+        sync: false
+      - key: WALLET_ADDRESS
+        sync: false
+      - key: CLOB_API_KEY
+        sync: false
+      - key: CLOB_SECRET
+        sync: false
+      - key: CLOB_PASSPHRASE
+        sync: false
+      - key: TELEGRAM_BOT_TOKEN
+        sync: false
+      - key: TELEGRAM_CHAT_ID
+        sync: false

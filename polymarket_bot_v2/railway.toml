@@ -1,0 +1,20 @@
+# railway.toml — Deploy PolyBot to Railway.app (US/EU servers)
+# India se access: Bot Railway ke US server pe chalega, Polymarket restriction nahi hogi
+# Dashboard: https://<your-app>.railway.app
+# Docs: https://docs.railway.app
+
+[build]
+builder = "NIXPACKS"
+buildCommand = "pip install -r requirements.txt"
+
+[deploy]
+startCommand = "python main.py --mode paper --capital 10"
+healthcheckPath = "/"
+healthcheckTimeout = 30
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 5
+
+[deploy.env]
+PORT = "8765"
+DASHBOARD_PORT = "8765"
+MODE = "paper"
